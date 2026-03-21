@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Theme.MicCast" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.BlueCast" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowBackground">@color/splash_background</item>
         <item name="windowSplashScreenBackground">@color/splash_background</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_miccast_launcher</item>
-        <item name="postSplashScreenTheme">@style/Theme.MicCast</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_bluecast_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.BlueCast</item>
         <item name="android:windowLightStatusBar" tools:targetApi="23">false</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="27">false</item>
     </style>
 </resources>
+
