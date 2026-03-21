@@ -1,6 +1,4 @@
-# BlueCast
-
-**"Where Voice Meets Technology"**
+<h1>BlueCast <sub>"Where Voice Meets Technology"</sub></h1>
 
 BlueCast is an Android app that turns your phone into a live wireless microphone for Bluetooth audio devices.
 
