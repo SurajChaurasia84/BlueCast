@@ -14,5 +14,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "MicCast"
+rootProject.name = "BlueCast"
 include(":app")
+
