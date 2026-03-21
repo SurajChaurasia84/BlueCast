@@ -71,6 +71,7 @@ class StreamingController(
         updateState {
             copy(
                 isStreaming = isStreaming,
+                isDeviceConnected = if (isStreaming) true else isDeviceConnected,
                 statusText = statusText ?: this.statusText,
                 message = message,
                 isTalkPressed = if (pushToTalkEnabled) false else true

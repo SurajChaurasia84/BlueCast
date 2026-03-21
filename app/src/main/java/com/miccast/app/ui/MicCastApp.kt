@@ -131,7 +131,7 @@ fun MicCastApp(
                 }
 
                 item {
-                    StatusCard(state = state, onConnectDevice = onConnectDevice)
+                    StatusCard(state = state)
                 }
 
                 item {
@@ -180,10 +180,10 @@ private fun ActionCard(
 }
 
 @Composable
-private fun StatusCard(
-    state: MicCastUiState,
-    onConnectDevice: () -> Unit
-) {
+private fun StatusCard(state: MicCastUiState) {
+    val isPositiveStatus = state.connectionStatus.startsWith("Connected to") ||
+        state.connectionStatus.startsWith("Streaming to")
+
     Card(
         shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0x1AF5F7FF))
@@ -203,16 +203,11 @@ private fun StatusCard(
                     Text(text = "Bluetooth audio route", color = Color.White, fontWeight = FontWeight.SemiBold)
                     Text(
                         text = state.connectionStatus,
-                        color = if (state.isDeviceConnected) SuccessGreen else WarningRed,
+                        color = if (isPositiveStatus) SuccessGreen else WarningRed,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
-            }
-
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                AssistChip(onClick = onConnectDevice, label = { Text("Connect") })
-                AssistChip(onClick = {}, label = { Text(if (state.supportsAudioOutput) "Supported" else "Not Supported") })
             }
         }
     }

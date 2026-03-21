@@ -63,6 +63,14 @@ class MicCastViewModel(
 
     private var splashInitialized = false
 
+    init {
+        viewModelScope.launch {
+            bluetoothDeviceManager.devices.collect { devices ->
+                syncSelectedDeviceStatus(devices)
+            }
+        }
+    }
+
     fun onScreenVisible() {
         if (!splashInitialized) {
             splashInitialized = true
@@ -108,6 +116,12 @@ class MicCastViewModel(
                 statusText = "Not supported",
                 supportsAudio = false,
                 message = "Selected device does not advertise Bluetooth audio output support."
+            )
+        } else if (device.isConnected) {
+            streamingController.updateConnection(
+                statusText = "Connected to ${device.name}",
+                supportsAudio = true,
+                isConnected = true
             )
         }
     }
@@ -165,6 +179,30 @@ class MicCastViewModel(
 
     fun clearMessage() {
         streamingController.clearMessage()
+    }
+
+    private fun syncSelectedDeviceStatus(devices: List<com.miccast.app.bluetooth.BluetoothEndpoint>) {
+        val currentState = streamingController.state.value
+        val selectedAddress = currentState.selectedDeviceAddress ?: return
+        val selectedDevice = devices.firstOrNull { it.address == selectedAddress } ?: return
+
+        if (selectedDevice.isConnected) {
+            streamingController.updateConnection(
+                statusText = if (currentState.isStreaming) {
+                    "Streaming to ${selectedDevice.name}"
+                } else {
+                    "Connected to ${selectedDevice.name}"
+                },
+                supportsAudio = selectedDevice.isAudioCapable,
+                isConnected = true
+            )
+        } else if (!currentState.isStreaming && currentState.supportsAudioOutput) {
+            streamingController.updateConnection(
+                statusText = "Not connected",
+                supportsAudio = selectedDevice.isAudioCapable,
+                isConnected = false
+            )
+        }
     }
 
     private fun hasRequiredPermissions(): Boolean {
