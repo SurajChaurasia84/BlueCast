@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">MicCast</string>
-    <string name="notification_title">MicCast is streaming audio</string>
+    <string name="app_name">BlueCast</string>
+    <string name="notification_title">BlueCast is streaming audio</string>
     <string name="notification_text">Live microphone audio is being routed to your Bluetooth output.</string>
 </resources>
+
