@@ -152,6 +152,22 @@ class MicCastViewModel(
         }
     }
 
+    fun disconnectSelectedDevice() {
+        val currentState = streamingController.state.value
+        if (!currentState.isDeviceConnected) return
+
+        if (currentState.isStreaming) {
+            streamingController.stopStreaming()
+        }
+        bluetoothDeviceManager.clearAudioRoute()
+        streamingController.updateConnection(
+            statusText = "Not connected",
+            supportsAudio = currentState.supportsAudioOutput,
+            isConnected = false
+        )
+        refreshDevices()
+    }
+
     fun toggleStreaming() {
         if (!hasRequiredPermissions()) {
             permissionState.value = true
