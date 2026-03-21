@@ -25,11 +25,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.BluetoothAudio
 import androidx.compose.material.icons.rounded.GraphicEq
 import androidx.compose.material.icons.rounded.Mic
+import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,7 +47,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -70,6 +75,7 @@ fun MicCastApp(
     onRefreshDevices: () -> Unit,
     onSelectDevice: (String) -> Unit,
     onConnectDevice: () -> Unit,
+    onDisconnectDevice: () -> Unit,
     onToggleStreaming: () -> Unit,
     onPushToTalkChange: (Boolean) -> Unit,
     onTalkPressedChange: (Boolean) -> Unit,
@@ -104,7 +110,7 @@ fun MicCastApp(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 20.dp, vertical = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(18.dp)
+                verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 item {
                     Text(
@@ -131,7 +137,7 @@ fun MicCastApp(
                 }
 
                 item {
-                    StatusCard(state = state)
+                    StatusCard(state = state, onDisconnectDevice = onDisconnectDevice)
                 }
 
                 item {
@@ -180,15 +186,19 @@ private fun ActionCard(
 }
 
 @Composable
-private fun StatusCard(state: MicCastUiState) {
+private fun StatusCard(
+    state: MicCastUiState,
+    onDisconnectDevice: () -> Unit
+) {
     val isPositiveStatus = state.connectionStatus.startsWith("Connected to") ||
         state.connectionStatus.startsWith("Streaming to")
+    var menuExpanded by remember { mutableStateOf(false) }
 
     Card(
         shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0x1AF5F7FF))
     ) {
-        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Box(
                     modifier = Modifier
@@ -199,7 +209,7 @@ private fun StatusCard(state: MicCastUiState) {
                 ) {
                     Icon(Icons.Rounded.BluetoothAudio, contentDescription = null, tint = Color.White)
                 }
-                Column(modifier = Modifier.weight(1f)) {
+                Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(text = "Bluetooth audio route", color = Color.White, fontWeight = FontWeight.SemiBold)
                     Text(
                         text = state.connectionStatus,
@@ -207,6 +217,24 @@ private fun StatusCard(state: MicCastUiState) {
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
+                }
+                Box {
+                    IconButton(onClick = { menuExpanded = true }) {
+                        Icon(Icons.Rounded.MoreVert, contentDescription = "More options", tint = Color.White)
+                    }
+                    DropdownMenu(
+                        expanded = menuExpanded,
+                        onDismissRequest = { menuExpanded = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Disconnect") },
+                            onClick = {
+                                menuExpanded = false
+                                onDisconnectDevice()
+                            },
+                            enabled = state.isDeviceConnected
+                        )
+                    }
                 }
             }
         }
@@ -236,7 +264,7 @@ private fun DeviceListCard(
         shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0x14182552))
     ) {
-        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        Column(modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 4.dp, bottom = 14.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -273,7 +301,7 @@ private fun DeviceListCard(
                                 Text(device.name, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                 Text(
                                     text = if (device.isAudioCapable) {
-                                        if (device.isConnected) "Audio capable • Connected" else "Audio capable"
+                                        if (device.isConnected) "Audio capable ï¿½ Connected" else "Audio capable"
                                     } else {
                                         "Not supported"
                                     },
