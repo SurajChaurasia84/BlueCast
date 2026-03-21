@@ -34,6 +34,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -297,11 +298,11 @@ private fun DeviceListCard(
                         selected = device.address == selectedAddress,
                         onClick = { onSelectDevice(device.address) },
                         label = {
-                            Column {
+                            Column(modifier = Modifier.padding(horizontal = 6.dp, vertical = 6.dp)) {
                                 Text(device.name, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                 Text(
                                     text = if (device.isAudioCapable) {
-                                        if (device.isConnected) "Audio capable ï¿½ Connected" else "Audio capable"
+                                        if (device.isConnected) "Audio capable • Connected" else "Audio capable"
                                     } else {
                                         "Not supported"
                                     },
@@ -312,7 +313,17 @@ private fun DeviceListCard(
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        leadingIcon = { Icon(Icons.Rounded.BluetoothAudio, contentDescription = null) }
+                        leadingIcon = { Icon(Icons.Rounded.BluetoothAudio, contentDescription = null) },
+                        shape = RoundedCornerShape(28.dp),
+                        border = null,
+                        colors = FilterChipDefaults.filterChipColors(
+                            containerColor = Color(0x1AFFFFFF),
+                            selectedContainerColor = Color(0x334C7DFF),
+                            labelColor = Color.White,
+                            selectedLabelColor = Color.White,
+                            iconColor = Color.White,
+                            selectedLeadingIconColor = Color.White
+                        )
                     )
                 }
             }
