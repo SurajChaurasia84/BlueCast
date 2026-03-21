@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.miccast.app"
+    namespace = "com.bluecast.app"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.miccast.app"
+        applicationId = "com.bluecast.app"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
@@ -83,3 +83,4 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     testImplementation("junit:junit:4.13.2")
 }
+
