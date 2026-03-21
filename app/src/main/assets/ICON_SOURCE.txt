@@ -1,0 +1,7 @@
+Place your custom launcher source image here as:
+
+app/src/main/assets/i.png
+
+Android launcher icons cannot be loaded directly from the assets folder at runtime.
+This file is kept as the source image location so it is easy to replace later.
+Once i.png is added, convert/copy it into mipmap launcher resources or ask Codex to wire it automatically.

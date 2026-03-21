@@ -1,0 +1,21 @@
+# Gradle
+.gradle/
+build/
+**/build/
+
+# Local Android SDK config
+local.properties
+
+# IDE
+.idea/
+*.iml
+
+# Kotlin/Compose caches
+.kotlin/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
