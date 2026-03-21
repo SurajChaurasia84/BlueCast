@@ -62,6 +62,7 @@ class MainActivity : ComponentActivity() {
                         onRefreshDevices = viewModel::refreshDevices,
                         onSelectDevice = viewModel::selectDevice,
                         onConnectDevice = viewModel::connectSelectedDevice,
+                        onDisconnectDevice = viewModel::disconnectSelectedDevice,
                         onToggleStreaming = viewModel::toggleStreaming,
                         onPushToTalkChange = viewModel::setPushToTalkEnabled,
                         onTalkPressedChange = viewModel::setTalkPressed,
