@@ -1,4 +1,4 @@
-package com.bluecast.app.ui
+﻿package com.bluecast.app.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
@@ -114,16 +114,19 @@ fun BlueCastApp(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 item {
-                    Text(
-                        text = "BlueCast",
-                        style = MaterialTheme.typography.displayLarge,
-                        color = Color.White
-                    )
-                    Text(
-                        text = "Where Voice Meets Technology",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = AquaGlow
-                    )
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(
+                            text = "BlueCast",
+                            style = MaterialTheme.typography.displayLarge,
+                            color = Color.White
+                        )
+                        Text(
+                            text = "Where Voice Meets Technology",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = AquaGlow,
+                            modifier = Modifier.padding(bottom = 10.dp)
+                        )
+                    }
                 }
 
                 if (state.missingPermissions) {
@@ -302,7 +305,7 @@ private fun DeviceListCard(
                                 Text(device.name, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                 Text(
                                     text = if (device.isAudioCapable) {
-                                        if (device.isConnected) "Audio capable � Connected" else "Audio capable"
+                                        if (device.isConnected) "Audio capable • Connected" else "Audio capable"
                                     } else {
                                         "Not supported"
                                     },
