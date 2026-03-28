@@ -1,5 +1,6 @@
 ﻿package com.bluecast.app.ui
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -7,7 +8,11 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,6 +27,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.BluetoothAudio
 import androidx.compose.material.icons.rounded.GraphicEq
 import androidx.compose.material.icons.rounded.Mic
@@ -58,6 +64,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -85,6 +92,7 @@ fun BlueCastApp(
     onRequestPermissions: () -> Unit
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
+    var activeScreen by remember { mutableStateOf(BlueCastScreen.Home) }
 
     LaunchedEffect(state.message) {
         state.message?.let {
@@ -107,62 +115,191 @@ fun BlueCastApp(
                 )
                 .padding(padding)
         ) {
-            androidx.compose.foundation.lazy.LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 20.dp, vertical = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                item {
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(
-                            text = "BlueCast",
-                            style = MaterialTheme.typography.displayLarge,
-                            color = Color.White
-                        )
-                        Text(
-                            text = "Where Voice Meets Technology",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = AquaGlow,
-                            modifier = Modifier.padding(bottom = 10.dp)
-                        )
-                    }
-                }
-
-                if (state.missingPermissions) {
-                    item {
-                        ActionCard(
-                            title = "Permissions required",
-                            subtitle = "BlueCast needs microphone and Bluetooth access before it can scan, connect, and stream.",
-                            actionText = "Grant permissions",
-                            onAction = onRequestPermissions
-                        )
-                    }
-                }
-
-                item {
-                    StatusCard(state = state, onDisconnectDevice = onDisconnectDevice)
-                }
-
-                item {
-                    DeviceListCard(
-                        devices = state.devices,
-                        selectedAddress = state.selectedDeviceAddress,
-                        isScanning = state.isScanning,
-                        onRefreshDevices = onRefreshDevices,
-                        onSelectDevice = onSelectDevice
-                    )
-                }
-
-                item {
-                    StreamCard(
+            AnimatedContent(
+                targetState = activeScreen,
+                transitionSpec = {
+                    fadeIn(animationSpec = tween(280)) togetherWith
+                        fadeOut(animationSpec = tween(220))
+                },
+                label = "bluecast_screen_transition"
+            ) { screen ->
+                when (screen) {
+                    BlueCastScreen.Home -> HomeScreenContent(
                         state = state,
+                        onRefreshDevices = onRefreshDevices,
+                        onSelectDevice = onSelectDevice,
+                        onDisconnectDevice = onDisconnectDevice,
                         onToggleStreaming = onToggleStreaming,
                         onPushToTalkChange = onPushToTalkChange,
                         onTalkPressedChange = onTalkPressedChange,
-                        onVolumeChanged = onVolumeChanged
+                        onVolumeChanged = onVolumeChanged,
+                        onRequestPermissions = onRequestPermissions,
+                        onOpenChat = { activeScreen = BlueCastScreen.Chat }
+                    )
+
+                    BlueCastScreen.Chat -> BlueCastChatScreen(
+                        onBack = { activeScreen = BlueCastScreen.Home }
                     )
                 }
+            }
+        }
+    }
+}
+
+private enum class BlueCastScreen {
+    Home,
+    Chat
+}
+
+@Composable
+private fun HomeScreenContent(
+    state: BlueCastUiState,
+    onRefreshDevices: () -> Unit,
+    onSelectDevice: (String) -> Unit,
+    onDisconnectDevice: () -> Unit,
+    onToggleStreaming: () -> Unit,
+    onPushToTalkChange: (Boolean) -> Unit,
+    onTalkPressedChange: (Boolean) -> Unit,
+    onVolumeChanged: (Float) -> Unit,
+    onRequestPermissions: () -> Unit,
+    onOpenChat: () -> Unit
+) {
+    androidx.compose.foundation.lazy.LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 20.dp, vertical = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = "BlueCast",
+                        style = MaterialTheme.typography.displayLarge,
+                        color = Color.White
+                    )
+                    Text(
+                        text = "Where Voice Meets Technology",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = AquaGlow,
+                        modifier = Modifier.padding(bottom = 10.dp)
+                    )
+                }
+
+                IconButton(
+                    onClick = onOpenChat,
+                    modifier = Modifier
+                        .size(46.dp)
+                        .clip(RoundedCornerShape(36.dp))
+                        .border(1.dp, Color.White.copy(alpha = 0.18f), RoundedCornerShape(36.dp))
+                ) {
+                    Icon(
+                        painter = painterResource(id = android.R.drawable.sym_action_chat),
+                        contentDescription = "Open BlueCast Chat",
+                        tint = Color.White
+                    )
+                }
+            }
+        }
+
+        if (state.missingPermissions) {
+            item {
+                ActionCard(
+                    title = "Permissions required",
+                    subtitle = "BlueCast needs microphone and Bluetooth access before it can scan, connect, and stream.",
+                    actionText = "Grant permissions",
+                    onAction = onRequestPermissions
+                )
+            }
+        }
+
+        item {
+            StatusCard(state = state, onDisconnectDevice = onDisconnectDevice)
+        }
+
+        item {
+            DeviceListCard(
+                devices = state.devices,
+                selectedAddress = state.selectedDeviceAddress,
+                isScanning = state.isScanning,
+                onRefreshDevices = onRefreshDevices,
+                onSelectDevice = onSelectDevice
+            )
+        }
+
+        item {
+            StreamCard(
+                state = state,
+                onToggleStreaming = onToggleStreaming,
+                onPushToTalkChange = onPushToTalkChange,
+                onTalkPressedChange = onTalkPressedChange,
+                onVolumeChanged = onVolumeChanged
+            )
+        }
+    }
+}
+
+@Composable
+private fun BlueCastChatScreen(
+    onBack: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 20.dp, vertical = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = onBack,
+                modifier = Modifier
+                    .size(46.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color(0x141FFFFFF))
+                    .border(1.dp, Color.White.copy(alpha = 0.18f), RoundedCornerShape(16.dp))
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                    contentDescription = "Back",
+                    tint = Color.White
+                )
+            }
+
+            Text(
+                text = "BlueCast Chat",
+                style = MaterialTheme.typography.headlineMedium,
+                color = Color.White
+            )
+        }
+
+        Card(
+            shape = RoundedCornerShape(28.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0x14182552))
+        ) {
+            Column(
+                modifier = Modifier.padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Text(
+                    text = "BlueCast Chat",
+                    color = Color.White,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = "This screen is ready. We can add chat messages, assistant prompts, or a full conversation flow here next.",
+                    color = Color.White.copy(alpha = 0.8f)
+                )
             }
         }
     }
@@ -430,4 +567,3 @@ private fun StreamCard(
         }
     }
 }
-
